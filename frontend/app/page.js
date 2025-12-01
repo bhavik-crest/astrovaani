@@ -28,7 +28,7 @@ export default function AstrologyListPage() {
             {/* HEADER + CREATE BUTTON */}
             <div className="max-w-4xl mx-auto flex items-center justify-between mb-10">
                 <h1 className="text-3xl font-bold tracking-wide">
-                    🔮 Astrology Reports
+                    🔮 Astrovaani Reports
                 </h1>
 
                 <Link

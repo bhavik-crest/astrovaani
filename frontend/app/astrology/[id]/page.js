@@ -96,7 +96,7 @@ export default function AstrologyDetailsPage() {
             {/* HEADER */}
             <div className="text-center mb-10">
                 <h1 className="text-3xl font-bold text-center">
-                    🔮 AI Astrology Report
+                    🔮 AI Astrovaani Report
                 </h1>
                 <p className="text-gray-300">Your personalized Vedic analysis</p>
             </div>
