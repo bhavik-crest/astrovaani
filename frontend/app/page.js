@@ -71,6 +71,9 @@ export default function AstrologyListPage() {
                             <p className="text-gray-300 mt-1 text-sm">
                                 {formatDate(r?.dob)} • {r?.tob}
                             </p>
+                             <p className="text-gray-300 mt-1 text-sm">
+                                Report language : {r?.language}
+                            </p>
                         </Link>
                     ))}
 

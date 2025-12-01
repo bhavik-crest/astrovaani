@@ -11,6 +11,7 @@ export default function CreateAstrologyReport() {
         dob: "",
         tob: "",
         pob: "",
+        language: "english",   // default language
     });
 
     const [loading, setLoading] = useState(false); // loader state
@@ -35,7 +36,8 @@ export default function CreateAstrologyReport() {
             const data = await res.json();
 
             if (res.ok) {
-                router.push("/astrology"); // Redirect back to list
+                const reportUUID = data?.id || '';
+                router.push(`/astrology/${reportUUID}`); // Redirect back to list
             } else {
                 // If backend sends array of errors
                 if (Array.isArray(data.detail)) {
@@ -112,6 +114,18 @@ export default function CreateAstrologyReport() {
                         className="w-full p-3 bg-white/10 rounded-lg border border-white/20 text-white"
                         required
                     />
+
+                    {/* 🔥 NEW LANGUAGE DROPDOWN */}
+                    <select
+                        name="language"
+                        value={form.language}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-white/10 rounded-lg border border-white/20 text-white"
+                    >
+                        <option value="english" className="text-black">English</option>
+                        <option value="hindi" className="text-black">Hindi</option>
+                        <option value="gujarati" className="text-black">Gujarati</option>
+                    </select>
 
                     <button
                         type="submit"

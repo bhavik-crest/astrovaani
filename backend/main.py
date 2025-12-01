@@ -27,7 +27,8 @@ app.add_middleware(
 SYSTEM_PROMPT = """
 You are an expert Vedic astrologer. Use the provided birth details to create a clear, practical astrology report.
 Sections required: basic_details, personality, career (top 5), avoid (colors/habits/industries), marriage, planets, remedies, summary.
-Return JSON only, with keys matching this structure.
+The report must be written in the user's selected language (English or Hindi).
+Return JSON only, with keys exactly matching this structure.
 """
 
 # Build the personalized user prompt using the request fields
@@ -40,9 +41,10 @@ def build_astrology_prompt(data: BirthRequest) -> str:
     Date of Birth: {data.dob.isoformat()}
     Time of Birth: {data.tob}
     Place of Birth: {data.pob}
+    Preferred Language: {data.language or 'English'}
     Extra: {json.dumps(data.extra) if data.extra else "None"}
 
-    Keep the JSON fields concise but meaningful. For lists, use arrays. For small texts, keep to 1-3 sentences.
+    The report must be written fully in the selected language above.Keep the JSON fields concise but meaningful. For lists, use arrays. For small texts, keep to 1-3 sentences.
     """
     return user_text
 
@@ -91,11 +93,17 @@ def get_report_by_id(report_id: str):
 
 @app.post("/generate-report", response_model=ReportResponse)
 async def generate_report(req: BirthRequest):
+
+    # Pass language to your prompt builder
     prompt = build_astrology_prompt(req)
 
     try:
-        # Call the OpenRouter API
-        router_resp = await call_openrouter(prompt=prompt, system_prompt=SYSTEM_PROMPT, max_tokens=1200, temperature=0.18)
+        router_resp = await call_openrouter(
+            prompt=prompt,
+            system_prompt=SYSTEM_PROMPT,
+            max_tokens=1200,
+            temperature=0.18
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OpenRouter call failed: {str(e)}")
 
@@ -124,24 +132,25 @@ async def generate_report(req: BirthRequest):
     except Exception:
         ai_text = json.dumps(router_resp)
 
-    # Try to parse AI JSON if it returned JSON string
+    # Try to parse JSON from AI output
     try:
-        # If ai_text is JSON-like string, parse it
         ai_json = json.loads(ai_text) if isinstance(ai_text, str) else {"raw": ai_text}
     except Exception:
         ai_json = {"raw": ai_text}
 
-    # Prepare payload for supabase
+    # SAVE into DB
     payload = {
         "name": req.name,
         "dob": req.dob.isoformat(),
         "tob": req.tob,
         "pob": req.pob,
+        "language": req.language,
         "input_data": {
             "name": req.name,
             "dob": req.dob.isoformat(),
             "tob": req.tob,
             "pob": req.pob,
+            "language": req.language,
             "extra": req.extra,
         },
         "ai_output": ai_json,
@@ -163,6 +172,7 @@ async def generate_report(req: BirthRequest):
         "dob": req.dob,
         "tob": record.get("tob"),
         "pob": record.get("pob"),
+        "language": record.get("language"),
         "ai_output": record.get("ai_output"),
         "created_at": record.get("created_at"),
     }
