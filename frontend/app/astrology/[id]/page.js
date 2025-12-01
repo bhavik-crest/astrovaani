@@ -25,7 +25,7 @@ export default function AstrologyDetailsPage() {
         setLoading(true);
         setError(null);
 
-        fetch(`http://127.0.0.1:8000/reports/${id}`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/${id}`)
             .then(res => res.json())
             .then(data => {
                 const raw = data?.data?.[0]?.ai_output?.raw;
