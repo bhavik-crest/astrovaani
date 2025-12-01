@@ -52,7 +52,7 @@ def build_astrology_prompt(data: BirthRequest) -> str:
 def list_reports():
     try:
         # Execute query
-        res = supabase.table("reports").select("*").execute()
+        res = supabase.table("reports").select("*").order("id", desc=True).execute()
 
         # res ONLY contains `.data` — no `.error`, no `.status_code`
         if res.data is None:
